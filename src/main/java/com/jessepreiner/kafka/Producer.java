@@ -17,7 +17,7 @@ public class Producer {
     public static final String CHATS_TOPIC = "chats";
     public static final String[] AUTHORS = new String[]{"Jesse Preiner", "Jennifer Ballantyne", "Jordan Mears", "Ashleigh Mattern"};
     public static final String[] CHAT_ROOMS = new String[]{"cats", "dogs", "tech", "futsal"};
-    private static final short NUM_PARTITIONS = 10;
+    private static final short NUM_PARTITIONS = 2;
 
     public Producer() {
     }
@@ -42,13 +42,12 @@ public class Producer {
                 int randomIdx = ThreadLocalRandom.current().nextInt(0, AUTHORS.length);
                 int randomIdx2 = ThreadLocalRandom.current().nextInt(0, CHAT_ROOMS.length);
                 String author = AUTHORS[randomIdx];
-                String chatRoomName = CHAT_ROOMS[randomIdx2];
-                String chatsTopic = MessageFormat.format("{0}.{1}", CHATS_TOPIC, chatRoomName);
-                Message message = new Message(UUID.randomUUID(), chatsTopic, author, LoremIpsum.getInstance().getWords(1, 156));
+                String chatName = CHAT_ROOMS[randomIdx2];
+                Message message = new Message(UUID.randomUUID(), chatName, author, LoremIpsum.getInstance().getWords(1, 156));
                 String serKey = gson.toJson(new Id(message.getMessageId()));
                 String serMsg = gson.toJson(message);
 
-                ProducerRecord<String, String> record = new ProducerRecord<>(chatsTopic, getPartition(message), serKey, serMsg);
+                ProducerRecord<String, String> record = new ProducerRecord<>(CHATS_TOPIC, serKey, serMsg);
                 System.out.println(record);
 
                 produceRecord(producer, record);
